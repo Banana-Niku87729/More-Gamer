@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<!-- Created with https://packager.turbowarp.org/ -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- We only include this to explicitly loosen the CSP of various packager environments. It does not provide any security. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:">
+  <title>More Gamer SP</title>
+  <style>
+    body {
+      color: #ffffff;
+      font-family: sans-serif;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    :root, body.is-fullscreen {
+      background-color: #ffffff;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    h1 {
+      font-weight: normal;
+    }
+    a {
+      color: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    #app, #loading, #error, #launch {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+      background-color: #ffffff;
+    }
+    #launch {
+      background-color: rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+    }
+    .green-flag {
+      width: 80px;
+      height: 80px;
+      padding: 16px;
+      border-radius: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      border: 3px solid hsla(0, 100%, 100%, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    #loading {
+      
+    }
+    .progress-bar-outer {
+      border: 1px solid currentColor;
+      height: 10px;
+      width: 200px;
+      max-width: 200px;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background-color: currentColor;
+    }
+    .loading-text, noscript {
+      font-weight: normal;
+      font-size: 36px;
+      margin: 0 0 16px;
+    }
+    .loading-image {
+      margin: 0 0 16px;
+    }
+    #error-message, #error-stack {
+      font-family: monospace;
+      max-width: 600px;
+      white-space: pre-wrap;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    #error-stack {
+      text-align: left;
+      max-height: 200px;
+      overflow: auto;
+    }
+    .control-button {
+      width: 2rem;
+      height: 2rem;
+      padding: 0.375rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      border: 0;
+      border-radius: 4px;
+    }
+    .control-button-highlight:hover {
+      background: #ff4c4c26;
+    }
+    .control-button-highlight.active {
+      background: #ff4c4c59;
+    }
+    .fullscreen-button {
+      background: white;
+    }
+    .standalone-fullscreen-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 0 0 0 4px;
+      padding: 4px;
+      cursor: pointer;
+    }
+    .sc-canvas {
+      cursor: auto;
+    }
+    .sc-monitor-root[data-opcode^="data_"] .sc-monitor-value-color {
+      background-color: #ff8c1a;
+    }
+    .sc-monitor-row-value-outer {
+      background-color: #fc662c;
+    }
+    .sc-monitor-row-value-editing .sc-monitor-row-value-outer {
+      background-color: #e25b27;
+    }
+    
+  </style>
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIYAAAB6CAYAAAB6KSvzAAAAAXNSR0IArs4c6QAAENhJREFUeF7tnQmc1VUVx7/sOIygMIMimpJLmLuYKLiUWqilqZkWWFFKVpZZ5pKa4lIa7ZprLrm12EfLNSsjci8U08ANDQcEkV0HBhGG6f3m/7/4eLw3//P/v/f+w593z+czn8cw59zl3N+799xzzr23C9CGJ6+BAg108cDwmCimAQ8Mj4uiGvDA8MDwwPAYsGvAzxh2XdUUpwdGTQ23vbMeGHZd1RSnB0ZNDbe9sx4Ydl3VFKcHRk0Nt72zHhh2XdUUpwdGTQ23vbMeGHZd1RSnB0ZNDbe9sx4Ydl3VFKcHRk0Nt72zHhh2XdUUpwdGTQ23vbMeGHZd1RSnB0ZNDbe9sx4Ydl3VFKcHRk0Nt72zHhh2XdUUpwdGTQ23vbMeGHZd1RSnB0ZNDbe9sx4Ydl3VFKcHRk0Nt72zHhh2XVWec5NNgjI32yz47Ldx8Lm0BVqWQvMyWLYM3nmn8nVHlJgYGIcA2yVs7q+B9Lu6dmMPBHZM0P7fhDJvx5UdOhRGfTSQ2nef4HPLLYPPnj2Czy5dg8/WVdC6Glpbgx+Bo2kmzJkDs16HmbPg6aehuTluK8z8iYHxK2A/czVrM54F3JNQtlJiDwJbJyjs6FDmRYvs/iNh+HAYtid8cCjUhzPCwIGBdH29pZRgxli8KJhJli8Pfn/7bXjpZXjmGZg8GZ6baivLyJUYGPcBHzdWUsj2W2B0QtlKiO0BTATCiTxWkR8KuZ8qJTVkazj6GDhwf9hue6ivg037w8ZGEMRpjWaQefPh7WZYMB+efgYefxwm/TNOKUV5EwPjfuDwhNW/BuwOvJVQvlyxnwDfTljI3qHc5EL5EfvAmNEwYgQ0DICGBujdO2EtCcRaWuD12bBgAcyfD2NPDApZsiRBYdApwGgFxuWm8psSNbk8oe7AM8DOCYtZBxgyIE87FT5zfACGAf0TllxBsVWrYIv3BQUKJAmoU4Chdj5QxlKUoJ9rRDTL3QX0SljIWsA45mg4eRzssQc0NiQssUpivcOla8WKRBV0GjDmAnvlZo7ZiZqdXOg2YExycdYAY/z5MPYLsPlm0CspzMpoSEeibW3QtWdZhXcaMNTq7wBa79MiGZtaRrYpo8KBl/0gmKG/fBJsumkZJVVRdOpU2EUmdnLqVGA8DoxM3vbYkl8CrgO6xZZ8T6Dr4mDNbnPOqSRl6Rst6iL1V4EuGA8Xfb+sgjsVGHIS9Sur+fGE5bsYFU9kDfcPTv16+7/P/flPyx9UBwzn0Zz7ZlCmHFuibt2hezfo0QP69YONNrK3+o034JBD4fnn7TJFOBMDoxw/Rn47qvSdWaer2wKaoULXUmyl9Z03p12mWTuPpN92eS1Fs2YGnwsWBp+a+vN/79MH6jaCPvWwzdYweHBgxwggm/SDAQNKt//6G2HcybH7VyhQM8A4PzdzX5hAXdO3375daoeXy/gGakaQM+qxx4IWXK0FDXjhBVuLBg2CnXaEoTvCLjvDrrtC/02gb1/YfPP3ypDr/PAj4OFHbOV2wJUYGOU4uPLb42wMfZurSf8GnNcyTj0H363NLUw88og4Yu/x/n0iTJ8OT/wLbrk1WRmFUv37w8iRMHIfOOggGNgIjY0BIA77REXq6HRgXBt24ysV6U7xQgQ+2RdJnNLdlgb+2dV96uK1ULEMDdQ118H98tpUiRR3OepIOORgmDgJrnEaLa++TgfGS2H75SKvVsT1GiDuqrsgtCUa578RX8NNTUG84kc/gWllLEFxa9bSIkBWgBIDo1LG58qwE8dWIeLqIhXyXQyNqawLz/1uu8T4Sy6KJ7lwEVz+S7j8isRxingVVoc7MTDuBSyrmQY+zDbosAfViLgKbKLblfIQoT+FmvKjrQ2zZrRLLHQ5Exb9axt69bVwyjcs3Os1T2JgWI3PV4wJPU3AbhWOuN4Zqv4YwxDI+B2Rx9dl5fLgt+4Ku0WRHFZd4Ml/wRdPghdN2RpRhXbq36sOjD8CyluKMvxWhxHXGyuoDheH2SKiTPE9BHwhHxhtbpGzNKgNFi+B08+Em5Sfln2qOjC0Y98zDJhFqUuzkGV5iirH/V1gE0U50f4AtOQBY2l9PRs3L7ZWE/Bddz2cehokjGbGq6z63FUHhnIu9I08z9CXSkdcLU83aV74TM7XdDxwXNjG34wezZjbbza0OGRpd0OPgueNDit7yZ3GWXVgyPBTPPJRwBKLrETEdZdQnc8Z1KrtsrbKMn6PCvn3+9uDPCa/gJVuvx1OGGvlzgRf1YFxR/htnAQoMzuKKhFxnRBWckZUZYB8HF/NeUXzjem6ua+z3KX0G8rg+NFwhxakDYeqDgztDLRt/FaYexG13ss9sz9g+baXGgYn62aOUnxLgUNzxrEiGH8NjeSWujr6KLTeM2qDG5aqwNiwvROn0K2vUKo6MLQr0XZxcC6VTwm0gwya0DdeRwySkvOgRuVVqT0uI+sfwIeBhw/YjwP/qd+MdOOv4URlsG5YVHVg3J23dussiSUUJU+ldjJJyWJ0quzv5dwUl4SVPBzOVN+7+AIuOc9iKoeCnx8Lt8qS2rCo6sCQh/TIUGfyE9xgyKDS1lEJNTJY45DzXFo2mvPCaGuYGdG+nMjB9dEH7uWhw7TAGGnYcJgyxcicHbaqA0MxFTdLKFvrP8acS8UI40Zc3b7AcizhL6F94YZKRu++wJDnpvDaLlHWSSglF3jjIFgYJtxkZ9wjW1p1YBQ6raxZ2m4bGSfiqrpEUQeh5PhStPX6PPW4GWPAy8+zKEzOidSeIpn9Osimiipg0t+iOJL//bfhLunaMCkoZklVB0bh+REda5RBGhVYk+Pp04BsFCvJQSYKz46XFFNcRr6L/DNaDhh9Z7xCs9LpLPTiS7Bj0qNLyiiO43a3NCiPRyF/0ZlnxxQM2FMHhkJSynD8gKG5vwM+a+BzLFajs1gk1wGjbtYMllsjqsrOksczKXlgrK25q0KnUpQ+ZRjuGiPiagGGzmV9KnRo5dfvgNF79kxWbGHZVBM4teTcSkrVBMaEHwetOivIK4lLqc8YaqCsf62uUclycSKuw3PG5JOG3k8Ll5EwUX+NhANGn1kzaLHOGHf9ET7lIiyGygtZPDDWVZo2eJazUtYzrr/MnQ47xTA2lwPfLMLngNEw/QUWbme8EuaRR+GAjxhqLcFSTWBkzcZwKro0l+NpMYt0FGdYxBlXpfBZ0veU1qubgIrdbeGAsc2zU2ja1bhd9cbnuoi3ZnCV+sbLltdg9DV83xQMC1fMoty65eb3hp3OEwVZWsVsjGFPPMqUfbQwGUj+i4a8cx0GkbVYqjljZNHGcMqRZ9NydlUA6uhaJ4HCstLLDLusxOC5GePQB+/jL6OMO42VKwM/hq4/SkIeGMW1dnrETOCkFHEVMP5bpBi5l7SMbBUxMPJxaB5wLvBCdgeMz916C7edEGOTrFPl7ohhXHAsWRBItMQAVn0f2Di8y6uj+rI8YyjiGp7mjFTpD0vYJF8DrgDC++5KlhOVNuiAccGF47no/HMj27OG4csnw68SZqpeLZM5l96mG3CsNOpjYPHMZhkY0oXF9yC+UhFXSwKQrnY6KRej6ShN1wHj0f1GsL/C7l2joBaO5M23vHfflXVwy+F74F6wBPmyuitxunHflag7KxRxPUz5EnlK/aAxZVAnRBTG7+iaMgeMVd2702vJfFbrpLmFZsyAD+wEsjfSoFoBhm7wE1miE4URV+uW95aCowHFxs8BQ39rfHU6C95vvHdn9WoYPgKeejoNWECtAENxC5EytaNIx3jkFFPEVRO9hkLBsFLkriVT2D8qjpkPjMPv+RN/PiLGLaZnnAU/Di9UiepEuX+//x44XHNnBGXdxvhk2D8FieNEXA/KOb6UBNSRW93tYgQed8aklDrzgXHV177CKVfKpDWSPKDHHg/zlP5TZbrvbvh4VGJBTjFZB0bcg8fyWWh20T7gixFj4JxilmzxfGA0bb0VQ156gTbrbXyyL84+F376syqjQtE/44yRdePTadJ6VYG2t7qiXbuRqIiGW2aeNQxXPjDEvu3UZ/nfTjJvDaRMrmnT4LjR9ltyDMUWZVnfbQzrNQhR/gPXeTmwdLlJH4PClAWmWSPquHHUUYX8qgq9sDd/bgxjb7oBukXtl7Tnbgtu4PtF7uqD05JeRm3ouFhqDRjqs4xJS3a4VvKOLllzvhGjJ6J9RAqB8W7PnjTMeo1mXWNkojbQXVuXTYArrgTtVqpB6zswrEE064whHcq7eWYFlBncrxecZbFS4VIiudMmXMYvzpDj3kJtgbdON+jccQdcOiGeR9NSRa3OGMrWku1gOePakR7/FP7RvS1i0XmxgN7swYPZ8nXnaTGUoiVFP6+8Cn+4Ey66GN591yAYg2V9nzEqbWM41biDPzFUtQ6rC4EpZ9RKpSK9XeJGQLWEyN54rSkAx5VXwcxSoTtr6/L4NpRdSZylRN3XafcfJdBXvoiLPepsqpWKLSWSHTgnGNT5umvTSs4Y1RNVirw+NBHuuhOaZllLKM1XK36MQg3ILpARGnUEoCMNx9mNuHJKAePGMcH8c+JtcqwnIIHkv1PhzXmBcapTaxP1vpJObhdLJMirY6utgjdQNmsMbgMWOMeNgx2iNuoy2MKv19nnJGh0JxwfsLRSWV8Gp2/RohRss2x5C4VLAcPxdVmxLPin9RS8E3Szh35ftAjmzoUl4dtOi8PDlDPD5APd9ivStYx1vWGjeujeFXr0gh7dgheTGhpBORlRtCECQ4826fxUnO2m05OOQFqSjOMCY+fJQQ76tL2UgVohctcyOYDUhQPeu1d8ABY2aUMEhvoow1HXH8Uhff/kKEty5WrUjOHaUT8xCMct0+uIugh+faWsx0pK6VVbTd3GE+XdzJfXVjdpMr8VGLvrJQDg2Ssuh4M/An0NaXadAZ4NFRgKrsk0M5hZ7WqXn/HUXC7FlQkHwQqMNU9fyQ6YcCkcOgp0n3ecN0UStjGW2IYKDClBj/4qJc9CMt8UNEt6IUFsYLhGHfdpOGE07LF7AJC4xqmlc0l4zgnzVuWBTUBVP6IY14+R34cDcpndfzYcZZSM8jksRwhK6cgKjKIP8mq3oIfzjjsW9FT3oDLOmiQYxDUis+cEd4G9ldv1jL84+O9JWmDjU2JgVMvzWdgF7TJ0lXRHJKezvA3ByyLJyHrGpcOXmvWOyElfgqM+GbxEpLxRvcOqF4sqSXp8V4O/dBm8uwKWLYe3lgTvokx+Cp54MnjeuwxKDAxNVOET9h1WLxu+nGfb5AmNui1YvgtdABfnkpXCRssdZHnoxj3N2eGzoHqzXQ/N7L4b7LUnbPv+4B13ucr1ozfPRD3CT/dGmksobm2F1tVBhFaxllWtsGpl8CNQLGuBOW+EP3NgZhP857mK3uyTGBhlgLH2RIcMAR171NPePXtB33AGqQ8PaLaFIfq3mgPdaBaQj0Mg0K09ixbDooUwfyHoLZQUyAMjBSVnsQoPjCyOWgpt9sBIQclZrMIDI4ujlkKbPTBSUHIWq/DAyOKopdBmD4wUlJzFKjwwsjhqKbTZAyMFJWexCg+MLI5aCm32wEhByVmswgMji6OWQps9MFJQchar8MDI4qil0GYPjBSUnMUqPDCyOGoptNkDIwUlZ7EKD4wsjloKbfbASEHJWazCAyOLo5ZCmz0wUlByFqvwwMjiqKXQZg+MFJScxSo8MLI4aim02QMjBSVnsQoPjCyOWgpt9sBIQclZrMIDI4ujlkKbPTBSUHIWq/g/GYWkPTvtzoYAAAAASUVORK5CYII=">
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="launch" class="screen" hidden title="Click to start">
+    <div class="green-flag">
+      <svg viewBox="0 0 16.63 17.5" width="42" height="44">
+        <defs><style>.cls-1,.cls-2{fill:#4cbf56;stroke:#45993d;stroke-linecap:round;stroke-linejoin:round;}.cls-2{stroke-width:1.5px;}</style></defs>
+        <path class="cls-1" d="M.75,2A6.44,6.44,0,0,1,8.44,2h0a6.44,6.44,0,0,0,7.69,0V12.4a6.44,6.44,0,0,1-7.69,0h0a6.44,6.44,0,0,0-7.69,0"/>
+        <line class="cls-2" x1="0.75" y1="16.75" x2="0.75" y2="0.75"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="loading" class="screen">
+    <noscript>Enable JavaScript</noscript>
+    
+    
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="loading-inner"></div></div>
+  </div>
+
+  <div id="error" class="screen" hidden>
+    <h1>Error</h1>
+    <details>
+      <summary id="error-message"></summary>
+      <p id="error-stack"></p>
+    </details>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    const appElement = document.getElementById('app');
+    const launchScreen = document.getElementById('launch');
+    const loadingScreen = document.getElementById('loading');
+    const loadingInner = document.getElementById('loading-inner');
+    const errorScreen = document.getElementById('error');
+    const errorScreenMessage = document.getElementById('error-message');
+    const errorScreenStack = document.getElementById('error-stack');
+
+    const handleError = (error) => {
+      console.error(error);
+      if (!errorScreen.hidden) return;
+      errorScreen.hidden = false;
+      errorScreenMessage.textContent = '' + error;
+      let debug = error && error.stack || 'no stack';
+      debug += '\nUser agent: ' + navigator.userAgent;
+      errorScreenStack.textContent = debug;
+    };
+    const setProgress = (progress) => {
+      if (loadingInner) loadingInner.style.width = progress * 100 + '%';
+    };
+    const interpolate = (a, b, t) => a + t * (b - a);
+
+    try {
+      setProgress(0.1);
+
+      const scaffolding = new Scaffolding.Scaffolding();
+      scaffolding.width = 1280;
+      scaffolding.height = 720;
+      scaffolding.resizeMode = "dynamic-resize";
+      scaffolding.editableLists = false;
+      scaffolding.usePackagedRuntime = true;
+      scaffolding.setup();
+      scaffolding.appendTo(appElement);
+
+      const vm = scaffolding.vm;
+      window.scaffolding = scaffolding;
+      window.vm = scaffolding.vm;
+      window.Scratch = {
+        vm,
+        renderer: vm.renderer,
+        audioEngine: vm.runtime.audioEngine,
+        bitmapAdapter: vm.runtime.v2BitmapAdapter,
+        videoProvider: vm.runtime.ioDevices.video.provider
+      };
+
+      scaffolding.setUsername("player####".replace(/#/g, () => Math.floor(Math.random() * 10)));
+      scaffolding.setAccentColor("#ff4c4c");
+
+      try {
+        scaffolding.addCloudProvider(new Scaffolding.Cloud.WebSocketProvider(["wss://clouddata.turbowarp.org","wss://clouddata.turbowarp.xyz"], "1057639781"));
+      } catch (error) {
+        console.error(error);
+      }
+
+      vm.setTurboMode(false);
+      if (vm.setInterpolation) vm.setInterpolation(false);
+      if (vm.setFramerate) vm.setFramerate(30);
+      if (vm.renderer.setUseHighQualityRender) vm.renderer.setUseHighQualityRender(false);
+      if (vm.setRuntimeOptions) vm.setRuntimeOptions({
+        fencing: true,
+        miscLimits: true,
+        maxClones: 300,
+      });
+      if (vm.setCompilerOptions) vm.setCompilerOptions({
+        enabled: true,
+        warpTimer: false
+      });
+      if (vm.renderer.setMaxTextureDimension) vm.renderer.setMaxTextureDimension(2048);
+
+      if (typeof ScaffoldingAddons !== 'undefined') {
+        ScaffoldingAddons.run(scaffolding, {"gamepad":false,"pointerlock":false,"specialCloudBehaviors":false,"unsafeCloudBehaviors":false,"pause":false});
+      }
+
+      scaffolding.setExtensionSecurityManager({
+        getSandboxMode: () => 'unsandboxed',
+        canLoadExtensionFromProject: () => true
+      });
+      for (const extension of []) {
+        vm.extensionManager.loadExtensionURL(extension);
+      }
+
+    } catch (e) {
+      handleError(e);
+    }
+  </script>
+  
+  
+    <script>
+      const getProjectData = (function() {
+        const storage = scaffolding.storage;
+        storage.onprogress = (total, loaded) => {
+          setProgress(interpolate(0.2, 0.98, loaded / total));
+        };
+        
+        storage.addWebStore(
+          [
+            storage.AssetType.ImageVector,
+            storage.AssetType.ImageBitmap,
+            storage.AssetType.Sound,
+            storage.AssetType.Font
+          ].filter(i => i),
+          (asset) => new URL('./assets/' + asset.assetId + '.' + asset.dataFormat, location).href
+        );
+        return () => new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          resolve(xhr.response);
+        };
+        xhr.onerror = () => {
+          if (location.protocol === 'file:') {
+            reject(new Error('Zip environment must be used from a website, not from a file URL.'));
+          } else {
+            reject(new Error('Request to load project data failed.'));
+          }
+        };
+        xhr.onprogress = (e) => {
+          if (e.lengthComputable) {
+            setProgress(interpolate(0.1, 0.2, e.loaded / e.total));
+          }
+        };
+        xhr.responseType = 'arraybuffer';
+        xhr.open('GET', "./assets/project.json");
+        xhr.send();
+      });
+      })();
+    </script>
+  <script>
+    const run = async () => {
+      const projectData = await getProjectData();
+      await scaffolding.loadProject(projectData);
+      setProgress(1);
+      loadingScreen.hidden = true;
+      if (true) {
+        scaffolding.start();
+      } else {
+        launchScreen.hidden = false;
+        launchScreen.addEventListener('click', () => {
+          launchScreen.hidden = true;
+          scaffolding.start();
+        });
+        launchScreen.focus();
+      }
+    };
+    run().catch(handleError);
+  </script>
+</body>
+</html>
